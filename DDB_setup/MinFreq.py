@@ -13,9 +13,10 @@ s.connect("localhost", 8848, "admin", "123456")
 CreateDBStatement="""
     drop database "dfs://MinFreq"
     dbPath = "dfs://MinFreq"
-    db = database(dbPath, HASH, [INT, 100])
+    db = database(dbPath, HASH, [DATE, 100])
 """
 s.run(CreateDBStatement)
+column_names = ["InstrumentId", "TradeDate", "TradeTime", "Open", "High", "Low", "Close", "Volume", "Amount", "TradeDateTime"]
 
 
 # Add table 1
@@ -25,14 +26,18 @@ reader = pa_ipc.open_file(feather_file)
 for i in range(reader.num_record_batches):
     batch = reader.get_batch(i)
     batch_pd = batch.to_pandas()
+    batch_pd["date"] = pd.to_datetime(batch_pd["date"], format="%Y-%m-%d").dt.date
     batch_pd["time"] = batch_pd["time"].astype(str)
-    batch_pd["time"] = pd.to_datetime(batch_pd["time"].str[:14], format="%Y%m%d%H%M%S", errors="coerce")
+    batch_pd["datetime"] = pd.to_datetime(batch_pd["time"].str[:14], format="%Y%m%d%H%M%S", errors="coerce")
+    batch_pd["time"] = batch_pd["datetime"].dt.time
+    batch_pd.columns = column_names
     s.upload({"batch_data": batch_pd})
     if i==0:
-        s.run("pt = db.createPartitionedTable(batch_data, `baostock_30min, `id)")
+        s.run("pt = db.createPartitionedTable(batch_data, `baostock_30min, `TradeDate)")
     s.run("append!(pt, batch_data)")
     if i%300==0:
         logging.info(f"Batch {i} completed.")
+
 
 
 # Add table 2
@@ -42,11 +47,16 @@ reader = pa_ipc.open_file(feather_file)
 for i in range(reader.num_record_batches):
     batch = reader.get_batch(i)
     batch_pd = batch.to_pandas()
+    batch_pd["date"] = pd.to_datetime(batch_pd["date"], format="%Y-%m-%d").dt.date
     batch_pd["time"] = batch_pd["time"].astype(str)
-    batch_pd["time"] = pd.to_datetime(batch_pd["time"].str[:14], format="%Y%m%d%H%M%S", errors="coerce")
+    batch_pd["datetime"] = pd.to_datetime(batch_pd["time"].str[:14], format="%Y%m%d%H%M%S", errors="coerce")
+    batch_pd["time"] = batch_pd["datetime"].dt.time
+    batch_pd.columns = column_names
     s.upload({"batch_data": batch_pd})
     if i==0:
-        s.run("pt = db.createPartitionedTable(batch_data, `baostock_5min, `id)")
+        s.run("pt = db.createPartitionedTable(batch_data, `baostock_30min, `TradeDate)")
     s.run("append!(pt, batch_data)")
     if i%300==0:
         logging.info(f"Batch {i} completed.")
+
+

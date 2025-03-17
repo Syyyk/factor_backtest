@@ -4,13 +4,14 @@ fileFolder = "E:/StockData/Daily/"  // Change to your folder
 
 // Create Database
 dbPath = "dfs://CSMAR"
-db = database(dbPath, HASH, [INT, 100])
+db = database(dbPath, HASH, [DATE, 100])
 
 // Add table
-colNames = `id`date`open`high`low`close`volume`amount`size`float_size`market_type`trade_state`price_type
+// colNames = `id`date`open`high`low`close`volume`amount`size`float_size`market_type`trade_state`price_type
+colNames = `InstrumentId`TradeDate`Open`High`Low`Close`Volume`Amount`Size`FloatSize`MarketType`TradeState`PriceType
 colTypes = [INT, DATE, DOUBLE, DOUBLE, DOUBLE, DOUBLE, INT, DOUBLE, DOUBLE, DOUBLE, INT, INT, INT]
 schema = table(10000:0, colNames, colTypes)
-pt = db.createPartitionedTable(schema, `Daily, `id)
+pt = db.createPartitionedTable(schema, `Daily, `TradeDate)
 
 // Load text
 // Some fields in CSMAR daily data
