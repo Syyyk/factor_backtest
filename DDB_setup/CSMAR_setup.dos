@@ -1,0 +1,34 @@
+// drop database "dfs://CSMAR"
+
+fileFolder = "E:/StockData/Daily/"  // Change to your folder
+
+// Create Database
+dbPath = "dfs://CSMAR"
+db = database(dbPath, HASH, [INT, 100])
+
+// Add table
+colNames = `id`date`open`high`low`close`volume`amount`size`float_size`market_type`trade_state`price_type
+colTypes = [INT, DATE, DOUBLE, DOUBLE, DOUBLE, DOUBLE, INT, DOUBLE, DOUBLE, DOUBLE, INT, INT, INT]
+schema = table(10000:0, colNames, colTypes)
+pt = db.createPartitionedTable(schema, `Daily, `id)
+
+// Load text
+// Some fields in CSMAR daily data
+// market_type 1=上证A股市场(不包含科创板) 2=上证B股市场 4=深证A股市场(不包含创业板) 8=深证B股市场 16=创业板 32=科创板 64=北证A股市场
+// trade_state 1=正常交易 2=ST 3=*ST 
+filePath = fileFolder + "CSMAR_Daily.csv"
+data = loadText(filename=filePath)
+
+// Insert
+batchSize = 1000000  // append in batches since the dataset is too large
+numRows = size(data)
+start_row = 0
+do {
+    end_row = min(start_row + batchSize, numRows)
+    append!(pt, data[start_row:(end_row-1)])
+    start_row += batchSize
+} while (start_row < numRows)
+
+// Test
+ppt = loadTable(db, `Daily)
+select * from ppt where amount>10000000000

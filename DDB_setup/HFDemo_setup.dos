@@ -1,0 +1,42 @@
+// drop database "dfs://HFDemo"
+
+fileFolder = "E:/StockData/HFDemo/"  // Change to your folder
+
+// Create Database
+dbPath = "dfs://HFDemo"
+db = database(dbPath, HASH, [STRING, 100])
+
+// Add table 1
+schema = table(100000:0,
+               `ExchangeID`InstrumentID`LocalTime`LastPrice`Volume`Amount, 
+               [STRING, STRING, NANOTIMESTAMP, DOUBLE, INT, DOUBLE])
+pt = db.createPartitionedTable(schema, `PriceVolume3s, `InstrumentID)
+filePath = fileFolder + "PriceVolume3s.csv"
+csvData = loadText(filename=filePath)
+csvData.dropColumns!(`col0)
+append!(pt, csvData)
+
+// Add table 2
+filePath = fileFolder + "Level23s.csv"
+csvData = loadText(filename=filePath)
+csvData.dropColumns!(`col0)
+pt = db.createPartitionedTable(csvData, `Level23s, `InstrumentID)
+append!(pt, csvData)
+
+// Add table 3
+filePath = fileFolder + "MarketOrderTick.csv"
+csvData = loadText(filename=filePath)
+csvData.dropColumns!(`col0)
+pt = db.createPartitionedTable(csvData, `MarketOrderTick, `InstrumentID)
+append!(pt, csvData)
+
+// Add table 4
+filePath = fileFolder + "MarketTradeTick.csv"
+csvData = loadText(filename=filePath)
+csvData.dropColumns!(`col0)
+pt = db.createPartitionedTable(csvData, `MarketTradeTick, `InstrumentID)
+append!(pt, csvData)
+
+// Test
+ppt = loadTable(db,`Level23s)
+select * from ppt where InstrumentID=="600600.SH";
