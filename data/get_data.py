@@ -10,11 +10,16 @@ def transform_date(date: Union[str, int]) -> str:
     return date[0:4] + '.' + date[4:6] + '.' + date[6:]
 
 
-def get_index_daily_ret_statement(start_date, end_date, index_id="000905.SH"):
-    # TODO
-    return 
+def get_index_daily_ret_statement(start_date: Union[str, int], end_date: Union[str, int], index_id: Optional[int] = 905) -> str:
+    start_date, end_date = transform_date(start_date), transform_date(end_date)
     ddb_statement = rf"""
-    Placeholder{None}
+    db = database("dfs://Daily")
+    pt = loadTable(db,`Index)
+    select TradeDate, InstrumentID, Close, Volume,
+    (Close - prev(Close)) / prev(Close) as ret from pt
+    where TradeDate >= {start_date} and TradeDate <= {end_date} 
+    and InstrumentId == {index_id}
+    context by InstrumentID csort TradeDate
     """
     return ddb_statement
 
@@ -23,8 +28,8 @@ def get_daily_ret_statement(start_date: Union[str, int], end_date: Union[str, in
     start_date, end_date = transform_date(start_date), transform_date(end_date)
     id_filter = f"and id == {stock_id}" if stock_id is not None else ""
     ddb_statement = rf"""
-    db = database("dfs://CSMAR")
-    pt = loadTable(db,`Daily)
+    db = database("dfs://Daily")
+    pt = loadTable(db,`Stock)
     select TradeDate, InstrumentID, Close, Volume,
     (Close - prev(Close)) / prev(Close) as ret from pt
     where TradeDate >= {start_date} and TradeDate <= {end_date} {id_filter}

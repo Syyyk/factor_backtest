@@ -1,4 +1,7 @@
-# ddb can run in this env: python 3.10, numpy 1.23, pandas 2.2, matplotlib 3.10, dolphindb 3.0.2.4
+# ddb can run in this env: python 3.10, numpy 1.24.4, pandas 2.2, matplotlib 3.10
+# SciPy 1.8, statsmodels 0.14.4, dolphindb 3.0.2.4, linearmodels 6.1
+# TODO: requirements
+
 
 import pyarrow.ipc as pa_ipc
 import dolphindb as ddb
