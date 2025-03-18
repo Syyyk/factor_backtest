@@ -1,17 +1,16 @@
-// drop database "dfs://CSMAR"
+// drop database "dfs://Daily"
 
 fileFolder = "E:/StockData/Daily/"  // Change to your folder
 
 // Create Database
-dbPath = "dfs://CSMAR"
+dbPath = "dfs://Daily"
 db = database(dbPath, HASH, [DATE, 100])
 
-// Add table
-// colNames = `id`date`open`high`low`close`volume`amount`size`float_size`market_type`trade_state`price_type
+// Add stock table
 colNames = `InstrumentId`TradeDate`Open`High`Low`Close`Volume`Amount`Size`FloatSize`MarketType`TradeState`PriceType
 colTypes = [INT, DATE, DOUBLE, DOUBLE, DOUBLE, DOUBLE, INT, DOUBLE, DOUBLE, DOUBLE, INT, INT, INT]
 schema = table(10000:0, colNames, colTypes)
-pt = db.createPartitionedTable(schema, `Daily, `TradeDate)
+pt = db.createPartitionedTable(schema, `Stock, `TradeDate)
 
 // Load text
 // Some fields in CSMAR daily data
@@ -30,6 +29,17 @@ do {
     start_row += batchSize
 } while (start_row < numRows)
 
+// Add index table
+colNames = `InstrumentID`TradeDate`Open`High`Low`Close`Volume`Amount
+colTypes = [INT, DATE, DOUBLE, DOUBLE, DOUBLE, DOUBLE, INT, DOUBLE]
+schema = table(10000:0, colNames, colTypes)
+pt = db.createPartitionedTable(schema, `Index, `TradeDate)
+
+filePath = fileFolder + "Index_Daily.csv"
+data = loadText(filename=filePath)
+append!(pt, data)
+
 // Test
-ppt = loadTable(db, `Daily)
+ppt = loadTable(db, `Stock)
 select * from ppt where amount>10000000000
+
