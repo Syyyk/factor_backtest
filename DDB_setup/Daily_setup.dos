@@ -16,7 +16,7 @@ pt = db.createPartitionedTable(schema, `Stock, `TradeDate)
 // Some fields in CSMAR daily data
 // market_type 1=上证A股市场(不包含科创板) 2=上证B股市场 4=深证A股市场(不包含创业板) 8=深证B股市场 16=创业板 32=科创板 64=北证A股市场
 // trade_state 1=正常交易 2=ST 3=*ST 
-filePath = fileFolder + "CSMAR_Daily.csv"
+filePath = fileFolder + "Stock_Daily.csv"
 data = loadText(filename=filePath)
 
 // Insert
