@@ -1,4 +1,4 @@
-# ddb can run in this env: python 3.10, numpy 1.23, pandas 2.2, matplotlib 3.10
+# ddb can run in this env: python 3.10, numpy 1.23, pandas 2.2, matplotlib 3.10, dolphindb 3.0.2.4
 
 import pyarrow.ipc as pa_ipc
 import dolphindb as ddb
@@ -54,7 +54,7 @@ for i in range(reader.num_record_batches):
     batch_pd.columns = column_names
     s.upload({"batch_data": batch_pd})
     if i==0:
-        s.run("pt = db.createPartitionedTable(batch_data, `baostock_30min, `TradeDate)")
+        s.run("pt = db.createPartitionedTable(batch_data, `baostock_5min, `TradeDate)")
     s.run("append!(pt, batch_data)")
     if i%300==0:
         logging.info(f"Batch {i} completed.")
