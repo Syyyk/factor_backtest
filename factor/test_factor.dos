@@ -1,7 +1,6 @@
 db = database("dfs://MinFreq")
 pt = loadTable(db,`baostock_5min)
 
-data = select TradeDate, TradeTime, Volume, Close, InstrumentId from pt where TradeDate>=2020.01.10 and TradeDate<=2020.01.15
 
 def calc_factor(TradeTime, Volume, Close){
     func_data = table(TradeTime as TradeTime, Volume as Volume, Close as Close)
@@ -17,4 +16,6 @@ def calc_factor(TradeTime, Volume, Close){
     return mean(peak_moments_return_list)
 }
 
-select calc_factor(TradeTime, Volume, Close) as factor from data group by InstrumentId, TradeDate
+select calc_factor(TradeTime, Volume, Close) as factor from pt
+where TradeDate>=2020.01.01 and TradeDate<=2020.04.30
+group by InstrumentId, TradeDate
