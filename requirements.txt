@@ -1,0 +1,7 @@
+numpy==1.24.4
+pandas==2.2
+matplotlib==3.10
+SciPy==1.8
+statsmodels==0.14.4
+linearmodels==6.1
+dolphindb==3.0.2.4
