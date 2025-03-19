@@ -14,7 +14,6 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 s = ddb.session()
 s.connect("localhost", 8848, "admin", "123456")
 CreateDBStatement="""
-    drop database "dfs://MinFreq"
     dbPath = "dfs://MinFreq"
     db = database(dbPath, HASH, [DATE, 100])
 """
