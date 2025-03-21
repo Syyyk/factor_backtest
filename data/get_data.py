@@ -30,10 +30,10 @@ def get_daily_ret_statement(start_date: Union[str, int], end_date: Union[str, in
     ddb_statement = rf"""
     db = database("dfs://Daily")
     pt = loadTable(db,`Stock)
-    select TradeDate as trade_date, InstrumentID as stock_code,
+    select TradeDate as trade_date, InstrumentId as stock_code,
     (Close - prev(Close)) / prev(Close) as ret from pt
     where TradeDate >= {start_date} and TradeDate <= {end_date} {id_filter}
-    context by InstrumentID csort TradeDate
+    context by InstrumentId csort TradeDate order by TradeDate, InstrumentId
     """
     return ddb_statement
 
@@ -47,7 +47,7 @@ def get_30min_ret_statement(start_date: Union[str, int], end_date: Union[str, in
     select TradeDate, TradeTime, InstrumentID, Close, Volume,
     (Close - prev(Close)) / prev(Close) as ret from pt
     where TradeDate >= {start_date} and TradeDate <= {end_date} {id_filter}
-    context by InstrumentID csort TradeDateTime
+    context by InstrumentID csort TradeDateTime order by TradeDateTime, InstrumentId
     """
     return ddb_statement
 
@@ -61,6 +61,6 @@ def get_5min_ret_statement(start_date: Union[str, int], end_date: Union[str, int
     select TradeDate, TradeTime, InstrumentID, Close, Volume,
     (Close - prev(Close)) / prev(Close) as ret from pt
     where TradeDate >= {start_date} and TradeDate <= {end_date} {id_filter}
-    context by InstrumentID csort TradeDateTime
+    context by InstrumentID csort TradeDateTime order by TradeDateTime, InstrumentId
     """
     return ddb_statement
