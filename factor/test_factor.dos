@@ -17,6 +17,6 @@ def calc_factor(TradeTime, Volume, Close){
 }
 
 select calc_factor(TradeTime, Volume, Close) as factor from pt
-where TradeDate>=2020.01.01 and TradeDate<=2020.04.30
+where TradeDate>=2020.06.01 and TradeDate<=2020.11.30
 group by TradeDate, InstrumentId
 order by TradeDate, InstrumentId

@@ -19,8 +19,8 @@ if __name__ == '__main__':
     factor_df.columns = ['trade_date', 'stock_code', 'factor']
 
     # get return dfs
-    ret_df = s.run(get_data.get_daily_ret_statement("20200101", "20200430"))
-    benchmark_df = s.run(get_data.get_index_daily_ret_statement("20200101", "20200430"))
+    ret_df = s.run(get_data.get_daily_ret_statement("20200601", "20201130"))
+    benchmark_df = s.run(get_data.get_index_daily_ret_statement("20200601", "20201130")).dropna()
 
     # preprocess
     factor_df = del_outlier(factor_df, 'factor', method='mad', n=3)
